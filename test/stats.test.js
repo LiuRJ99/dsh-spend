@@ -77,6 +77,16 @@ test("non-alias providers keep their exact match behavior", () => {
   assert.equal(stats.plans[0].usedRequests, 2);
 });
 
+test("same model names remain separate across providers", () => {
+  const stats = buildStats([
+    sample("openai", "shared-model", 1000),
+    sample("openrouter", "shared-model", 2000),
+  ], [], {});
+  assert.equal(stats.byModel.length, 2);
+  assert.deepEqual(new Set(stats.byModel.map((row) => row.provider)), new Set(["openai", "openrouter"]));
+  assert.equal(stats.bySessionModel.length, 2);
+});
+
 test("minimax-cn alias usage lands on the minimax code plan windows", () => {
   const stats = buildStats([sample("minimax-cn"), sample("minimax-cn")], [], {}, {
     plans: [{ provider: "minimax", type: "code", quota: { requestsPerWeek: 100 } }],
@@ -151,6 +161,36 @@ test("scanSessions streams zstd frames and reuses unchanged durable files", asyn
     assert.equal(live.decodeErrors, 0);
     assert.equal(live.calls.length, 1);
     assert.equal(live.calls[0].outputTokens, 4);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("scanSessions expands persisted packed chunk rows for performance metrics", async () => {
+  const root = await mkdtemp(join(tmpdir(), "dsh-spend-packed-"));
+  const sessionDir = join(root, "workspace", "s-packed");
+  const file = join(sessionDir, "session.jsonl.zstd");
+  const now = Date.now();
+  const events = [
+    { type: "session", id: "s-packed", cwd: "/workspace", createdAt: now },
+    { type: "request/header", time: now, data: { header: { config: { provider: "deepseek", model: "deepseek-v4" } } } },
+    { type: "step/start", time: now + 10, data: { turn: 0, step: 0 } },
+    {
+      type: "text-chunks",
+      seq0: 3,
+      time0: now + 20,
+      data: { turn: 0, step: 0, index: 0, dt: [5, 5], texts: ["a", "b", "c"] },
+    },
+    { type: "assistant/message", time: now + 40, data: { turn: 0, step: 0, usage: { outputTokens: 10 } } },
+  ];
+  try {
+    await mkdir(sessionDir, { recursive: true });
+    await writeFile(file, zstdCompressSync(Buffer.from(`${events.map((event) => JSON.stringify(event)).join("\n")}\n`)));
+    const scanned = await scanSessions(root);
+    assert.equal(scanned.decodeErrors, 0);
+    assert.equal(scanned.calls.length, 1);
+    assert.equal(scanned.calls[0].perf.ttftMs, 20);
+    assert.equal(scanned.calls[0].perf.genMs, 10);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

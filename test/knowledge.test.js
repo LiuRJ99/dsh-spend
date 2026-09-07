@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { discoverPlans, normalizeProvider, PROVIDER_ALIASES } from "../lib/knowledge.js";
+import { discoverPlans, knowsProvider, normalizeProvider, PROVIDER_ALIASES } from "../lib/knowledge.js";
 
 test("normalizeProvider maps every declared alias to its canonical id", () => {
   for (const [alias, canonical] of Object.entries(PROVIDER_ALIASES)) {
@@ -16,6 +16,11 @@ test("normalizeProvider maps every declared alias to its canonical id", () => {
   assert.equal(normalizeProvider(undefined), undefined);
   assert.equal(normalizeProvider(null), null);
   assert.equal(normalizeProvider(""), "");
+});
+
+test("knowsProvider accepts aliases", () => {
+  assert.equal(knowsProvider("deepseek-official"), true);
+  assert.equal(knowsProvider("no-such-provider"), false);
 });
 
 test("discoverPlans: alias pair yields exactly one canonical plan", () => {
