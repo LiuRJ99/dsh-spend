@@ -8,6 +8,7 @@ A **floating usage widget** pinned to the bottom-right corner of the dsh Web UI:
 
 ## Table of contents
 
+- [Fork Enhancements (v0.6.4)](#fork-enhancements-v064)
 - [Highlights](#highlights)
 - [Screenshots](#screenshots)
 - [Interactions](#interactions)
@@ -18,6 +19,31 @@ A **floating usage widget** pinned to the bottom-right corner of the dsh Web UI:
 - [Rate sources & cost model](#rate-sources--cost-model)
 - [Repository layout](#repository-layout)
 - [Notes & limitations](#notes--limitations)
+
+---
+
+## Fork Enhancements (v0.6.4)
+
+> This repository is a maintained and performance-enhanced fork of [`nonewind/dsh-spend`](https://github.com/nonewind/dsh-spend) (maintained at [`LiuRJ99/dsh-spend`](https://github.com/LiuRJ99/dsh-spend), version `v0.6.4`). While preserving all upstream visual metrics, charts, and auto-detected billing capabilities, it resolves critical cold-start performance bottlenecks in large session histories and updates host compatibility.
+
+### 1. Installation from this Fork
+
+```bash
+# Recommended: install the verified v0.6.4 Release Tag
+dsh plugin --profile web add "github:LiuRJ99/dsh-spend#v0.6.4"
+```
+
+### 2. Key Performance & Stability Enhancements
+
+* **Non-Blocking Startup Scan**:
+  * Offloaded historical session directory and usage log parsing completely off the Node.js main event loop, preventing DSH Web startup freezes and lag when hundreds or thousands of prior sessions exist.
+* **Persistent Usage Scan Disk Cache**:
+  * Implemented cross-restart disk caching for scanned usage statistics; restarts and reloads hit the disk cache immediately, dropping recovery latency from tens of seconds to milliseconds.
+* **Live Session Snapshot Reuse**:
+  * Reuses complete in-memory live session snapshots directly from the DSH host runtime, significantly reducing repetitive disk I/O.
+* **DSH 0.1.2-rc.1 Compatibility & CI Workflows**:
+  * Restored data structure parsing compatibility with DSH 0.1.2 session snapshots;
+  * Added automated GitHub Actions CI build and test pipelines.
 
 ---
 
