@@ -9,7 +9,7 @@ import { mkdtemp, mkdir, rm, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { zstdCompressSync } from "node:zlib";
-import { buildStats, scanSessions } from "../lib/stats.js";
+import { buildStats, decodeStorageRecord, scanSessions } from "../lib/stats.js";
 
 const now = Date.now();
 const Flash = {
@@ -191,6 +191,32 @@ test("scanSessions expands persisted packed chunk rows for performance metrics",
     assert.equal(scanned.calls.length, 1);
     assert.equal(scanned.calls[0].perf.ttftMs, 20);
     assert.equal(scanned.calls[0].perf.genMs, 10);
+
+    // Verify inline decoding for reasoning-chunks, tool-call-chunks, native events, and edge cases
+    assert.deepEqual(decodeStorageRecord({
+      type: "reasoning-chunks",
+      seq0: 1,
+      time0: 100,
+      data: { turn: 0, step: 0, index: 0, dt: [10], texts: ["r1", "r2"] },
+    }), [
+      { type: "assistant/chunk", seq: 1, time: 100, data: { turn: 0, step: 0, chunk: { type: "reasoning-delta", index: 0, text: "r1" } } },
+      { type: "assistant/chunk", seq: 2, time: 110, data: { turn: 0, step: 0, chunk: { type: "reasoning-delta", index: 0, text: "r2" } } },
+    ]);
+
+    assert.deepEqual(decodeStorageRecord({
+      type: "tool-call-chunks",
+      seq0: 5,
+      time0: 200,
+      data: { turn: 0, step: 0, index: 0, id: "call_1", name: "bash", dt: [20], args: ["{\"cmd\":", "\"ls\"}"] },
+    }), [
+      { type: "assistant/chunk", seq: 5, time: 200, data: { turn: 0, step: 0, chunk: { type: "tool-call-delta", index: 0, id: "call_1", name: "bash", argumentsDelta: "{\"cmd\":" } } },
+      { type: "assistant/chunk", seq: 6, time: 220, data: { turn: 0, step: 0, chunk: { type: "tool-call-delta", index: 0, id: "call_1", name: "bash", argumentsDelta: "\"ls\"}" } } },
+    ]);
+
+    const nativeEvent = { type: "step/start", time: 300, data: { turn: 0, step: 0 } };
+    assert.deepEqual(decodeStorageRecord(nativeEvent), [nativeEvent]);
+    assert.deepEqual(decodeStorageRecord(null), [null]);
+    assert.deepEqual(decodeStorageRecord("invalid"), ["invalid"]);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

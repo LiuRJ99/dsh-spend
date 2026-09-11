@@ -10,7 +10,7 @@
 
 ## 目录
 
-- [Fork 增强特性（v0.6.4）](#fork-增强特性v064)
+- [Fork 增强特性（v0.6.5）](#fork-增强特性v065)
 - [功能特性](#功能特性)
 - [界面预览](#界面预览)
 - [交互方式](#交互方式)
@@ -24,19 +24,22 @@
 
 ---
 
-## Fork 增强特性（v0.6.4）
+## Fork 增强特性（v0.6.5）
 
-> 本项目为 [`nonewind/dsh-spend`](https://github.com/nonewind/dsh-spend) 的维护与性能增强分支（维护仓库：[`LiuRJ99/dsh-spend`](https://github.com/LiuRJ99/dsh-spend)，版本 `v0.6.4`）。在完整保留原版多维统计、图表分析与订阅识别能力的基础上，重点解决了大规模历史会话下的冷启动性能瓶颈与宿主兼容性问题。
+> 本项目为 [`nonewind/dsh-spend`](https://github.com/nonewind/dsh-spend) 的维护与性能增强分支（维护仓库：[`LiuRJ99/dsh-spend`](https://github.com/LiuRJ99/dsh-spend)，版本 `v0.6.5`）。在完整保留原版多维统计、图表分析与订阅识别能力的基础上，重点解决了大规模历史会话下的冷启动性能瓶颈与宿主兼容性问题。
 
 ### 1. 本 Fork 安装方式
 
 ```bash
-# 推荐：安装经过完整验证的 v0.6.4 Release Tag
-dsh plugin --profile web add "github:LiuRJ99/dsh-spend#v0.6.4"
+# 推荐：安装经过完整验证的 v0.6.5 Release Tag
+dsh plugin --profile web add "github:LiuRJ99/dsh-spend#v0.6.5"
 ```
 
 ### 2. 核心性能与稳定性增强
 
+* **DSH 0.1.5 宿主兼容（消除 decodeStorageRecord 依赖）**：
+  * 内联实现对历史 packed rows（`text-chunks` / `reasoning-chunks` / `tool-call-chunks`）的兼容解包展开；
+  * 彻底移除对 `@deepseek-ai/dsh-session` 的 `decodeStorageRecord` 导出强依赖，原生兼容 DSH 0.1.5+。
 * **冷启动扫描解耦主事件循环（Non-blocking Startup Scan）**：
   * 将全量历史会话扫描逻辑彻底移出 Node.js 主事件循环，避免海量历史会话文件读取造成 DSH Web 启动时严重卡顿或假死。
 * **用量扫描磁盘持久化缓存（Persistent Cache Across Restarts）**：
