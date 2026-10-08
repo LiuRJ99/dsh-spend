@@ -8,6 +8,12 @@
 
 在 dsh Web UI 右下角显示一个**悬浮用量窗口**：实时查看 token 调用量、多维度统计与预计计费金额，**零配置**自动识别计费计划并直读订阅商真实额度/余额。
 
+## DSH 0.2.0-rc.2 候选适配
+
+当前源码版本：`0.6.7-dev.1`。DSH 兼容声明精确固定到 `0.2.0-rc.2`，未验证 `0.2.1-alpha.1`。以下旧 release/tag 示例保留为历史说明；本轮验证请使用 [插件目录的固定提交和本地验证说明](https://github.com/LiuRJ99/awesome-dsh-plugins/blob/main/docs/dsh-0.2.0-rc.2.zh-CN.md)，不要安装旧 tag 或裸 npm 包名。
+
+26 项测试通过，真实 Web usageStats/query RPC 返回有效统计快照；模型调用和完整 UI 交互需本地验证。
+
 ## 目录
 
 - [Fork 增强特性（v0.6.5）](#fork-增强特性v065)
