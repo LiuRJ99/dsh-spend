@@ -1,3 +1,9 @@
+## 0.6.7-dev.3 — 2026-10-18
+
+Align Host peers with 0.2.1-rc.1 and drop the retired invariants peer. Retain usage views, billing detection and the Taskboard dialog integration.
+
+Compatibility is restricted to `0.2.0-rc.2 || 0.2.1-rc.1`; no alpha or later Host is implied.
+
 # Changelog
 
 ## [0.6.7-dev.2] - 2026-10-08
