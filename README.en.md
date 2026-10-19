@@ -8,7 +8,7 @@ A **floating usage widget** pinned to the bottom-right corner of the dsh Web UI:
 
 ## DSH release compatibility
 
-Current source version: `0.6.7-dev.3`. Host compatibility: `0.2.0-rc.2 || 0.2.1-rc.1`. Use the fixed release source in the [plugin catalog](https://github.com/LiuRJ99/awesome-dsh-plugins#plugin-catalog).
+Current source version: `0.6.7-dev.4`. Host compatibility: `>=0.2.0-rc.2`. Use the fixed release source in the [plugin catalog](https://github.com/LiuRJ99/awesome-dsh-plugins#plugin-catalog).
 
 26 tests passed and the real Web usageStats/query RPC returned a valid statistics snapshot. Model calls and complete UI interactions require local validation.
 
@@ -281,3 +281,7 @@ dsh-spend/
 ## License
 
 [MIT](LICENSE)
+
+## Host compatibility policy
+
+The minimum Host requirement is `>=0.2.0-rc.2`. Newer DSH versions remain eligible by default; narrow the range or adapt the implementation only when an incompatibility is confirmed. Do not maintain an allowlist of individual RCs. Fixed build SDK versions describe build inputs, not the allowed Host versions. Installation sources stay pinned to releases/tags. Qualification evidence is recorded separately: an eligible future Host is not automatically a tested Host.
